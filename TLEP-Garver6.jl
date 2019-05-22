@@ -1,4 +1,5 @@
-
+#Using JULIA language
+#Author: Juan Luis Barberia
 #Load data for 6 bus system (garver)
 
 using CSV
@@ -27,7 +28,6 @@ n0     =Array(branchdata.n0)
 B      =Array(branchdata.b)
 cost   =Array(branchdata.cost)
 f_max  =Array(branchdata.f_max)
-
 indexi=[]
 indexj=[]
 for i=1:length(branchdata.from); push!(indexi,branchdata.from[i]);push!(indexj,branchdata.to[i]) ;end
@@ -56,17 +56,15 @@ m=Model(with_optimizer(optimizer,params))
 
 #Def constraint
 
-@constraint(m,f.<=(n+n0).*f_max)
-@constraint(m,f.>=(n+n0).*(-f_max))
+@constraint(m,f.<=(n+n0).*f_max)                                #Max flow per line
+@constraint(m,f.>=(n+n0).*(-f_max))                             #Max flow per line
+@constraint(m,f-B.*(n+n0).*(theta[indexi]-theta[indexj]).==0)   #KVL
 
-@constraint(m,f-B.*(n+n0).*(theta[indexi]-theta[indexj]).==0)
-
-#Create Y matrix
+#Create Y matrix for KCL
 
 Y=Array{GenericAffExpr{Float64,VariableRef},1}()
 for i=1:(lenbus^2);push!(Y,0);end
 Y=reshape(Y,lenbus,lenbus)
-
 Bn=B.*(n+n0)
 
 for i=1:lenline
@@ -78,7 +76,7 @@ for i=1:lenline
   Y[y,y]-=Bn[i]
 end
 
-@constraint(m,Y*theta+r+g.==d)
+@constraint(m,Y*theta+r+g.==d)                                #KCL
 
 #Def objective
 
@@ -95,9 +93,9 @@ println("Objective:")
 println(JuMP.objective_value(m))
 
 for i=1:lenline;
-ii=indexi[i]
-ij=indexj[i]
-N=convert(Int,JuMP.value.(n[i]))
-N0=n0[i]
-println("Line $ii,$ij.........n0=$N0........nk=$N")
+  ii=indexi[i]
+  ij=indexj[i]
+  N=convert(Int,JuMP.value.(n[i]))
+  N0=n0[i]
+  println("Line $ii,$ij.........n0=$N0........nk=$N")
 end
