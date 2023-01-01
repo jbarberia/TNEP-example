@@ -1,4 +1,4 @@
-# Transmission line expansion problem
+# Transmission Network Expansion Problem
 
 An example of the formulation of the `sanchez2005transmission` paper for a the PID ENUTIBA0005136TC "DESARROLLO DE METODOLOGIAS Y HERRAMIENTAS PARA EL DISENO DE EXPANSIONES DEL SISTEMAS DE TRANSMISION"
 
